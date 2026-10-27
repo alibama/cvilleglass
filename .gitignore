@@ -1,0 +1,3 @@
+# Payments, keys and settings live here on the server — never commit them.
+data/
+.DS_Store

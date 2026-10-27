@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>document.documentElement.classList.add("js");</script>
+  <title>Get involved — Charlottesville Glass</title>
+  <meta name="description" content="Support Charlottesville Glass: donate securely, give $75 to make a glass flower or bauble, volunteer, partner, or give in kind. Every gift keeps community glass programs running." />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <link rel="canonical" href="https://cvilleglass.org/get-involved.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Get involved — Charlottesville Glass" />
+  <meta property="og:description" content="Volunteer, partner, or support community glass programs in Charlottesville." />
+  <meta property="og:url" content="https://cvilleglass.org/get-involved.html" />
+  <meta property="og:image" content="https://cvilleglass.org/assets/og-image.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <nav class="wrap nav" aria-label="Primary">
+      <a class="brand" href="index.html" aria-label="Charlottesville Glass — home">
+        <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true">
+          <rect width="64" height="64" rx="14" fill="#0e3e39"/>
+          <g style="mix-blend-mode:screen">
+            <rect x="14" y="16" width="30" height="22" rx="5" fill="#a6c8b8" opacity="0.9"/>
+            <rect x="24" y="24" width="26" height="24" rx="5" fill="#c9ded4" opacity="0.75"/>
+            <rect x="18" y="30" width="22" height="18" rx="5" fill="#dd8226" opacity="0.85"/>
+          </g>
+        </svg>
+        <span>Charlottesville&nbsp;<b>Glass</b></span>
+      </a>
+      <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        Menu
+      </button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="about.html">About</a></li>
+        <li><a href="programs.html">Programs</a></li>
+        <li><a href="experiences.html">Experiences</a></li>
+        <li><a href="get-involved.html" aria-current="page">Get involved</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li class="nav-cta"><a class="btn btn--amber" href="#support">Support us</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main">
+
+    <section class="page-hero band--tight">
+      <div class="panes" aria-hidden="true">
+        <span class="pane p1"></span>
+        <span class="pane p2"></span>
+        <span class="pane p3"></span>
+      </div>
+      <div class="wrap">
+        <p class="eyebrow">Get involved</p>
+        <h1>Help us light the furnace.</h1>
+        <p class="lead">We’re a young organization with a real plan and a lot of momentum. Here’s how you can help us open the doors and keep them open.</p>
+      </div>
+    </section>
+
+    <!-- DONATE -->
+    <section class="band" id="support">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <p class="eyebrow">Donate</p>
+          <h2>Give to Charlottesville Glass.</h2>
+          <p class="lead measure">Your gift buys glass, gas, and time at the bench — and helps keep pay-what-you-can seats open so cost is never the reason someone stays home.</p>
+        </div>
+
+        <div class="give-card reveal">
+          <form id="donate-form" novalidate>
+            <span class="eyebrow" style="color:var(--amber-ink);">Choose an amount</span>
+            <!--
+              OPTIONAL: to make each preset an EXACT charge without the Worker,
+              create a fixed Payment Link per amount and paste it as data-link="..."
+              on the matching button below. Otherwise the amount is set on Stripe.
+            -->
+            <div class="amount-grid" role="group" aria-label="Suggested donation amounts">
+              <button type="button" class="amount-chip" data-amount="25">$25</button>
+              <button type="button" class="amount-chip" data-amount="50" aria-pressed="true">$50</button>
+              <button type="button" class="amount-chip" data-amount="100">$100</button>
+              <button type="button" class="amount-chip" data-amount="250">$250</button>
+            </div>
+            <div class="give-custom">
+              <span class="cur">$</span>
+              <input id="donate-amount" name="amount" type="number" min="1" step="1" inputmode="decimal" value="50" aria-label="Donation amount in US dollars" />
+              <span class="cur" style="font-size:var(--step--1);font-weight:500;">USD</span>
+            </div>
+            <!-- REPLACE this href with your Stripe "customer chooses amount" Payment Link -->
+            <a class="btn btn--amber" id="donate-go" data-submit href="https://buy.stripe.com/REPLACE_DONATION">Donate securely</a>
+            <p class="give-note">
+              Secure checkout by Stripe · you’ll confirm the amount on the next screen. You can also
+              <!-- REPLACE with your monthly (recurring) Payment Link -->
+              <a href="https://buy.stripe.com/REPLACE_MONTHLY">set up a monthly gift &rarr;</a>
+              or <a href="experiences.html">give&nbsp;$75 and make something &rarr;</a>.
+            </p>
+            <p class="give-note">Charlottesville Glass is a newly forming nonprofit; we’ll confirm whether gifts are tax-deductible once our 501(c)(3) status is finalized. Need documentation now? <a href="mailto:hello@cvilleglass.org?subject=Giving%20question">Ask us</a>.</p>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- WAYS TO HELP -->
+    <section class="band band--paper2">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <p class="eyebrow">More than money</p>
+          <h2>Ways to help right now.</h2>
+          <p class="lead">Money matters, but it isn’t the only thing that gets a studio running. A few of these might be a better fit for you.</p>
+        </div>
+        <div class="ways">
+          <div class="way reveal">
+            <h4>Volunteer</h4>
+            <p>Help at open days, assist facilitators, or lend a professional skill — bookkeeping, grant writing, photography, web.</p>
+          </div>
+          <div class="way reveal">
+            <h4>Partner with us</h4>
+            <p>Clinicians, recovery programs, schools, and employers: let’s design sessions for the people you serve.</p>
+          </div>
+          <div class="way reveal">
+            <h4>Refer someone</h4>
+            <p>Know a person or group who’d benefit from studio time? Point them our way, or tell us about them.</p>
+          </div>
+          <div class="way reveal">
+            <h4>Give in kind</h4>
+            <p>Glass, tools, kiln and hot-shop equipment, safety gear, or studio materials — usable donations go straight to work.</p>
+          </div>
+          <div class="way reveal">
+            <h4>Sponsor a seat</h4>
+            <p>Underwrite pay-what-you-can seats so cost is never the reason someone stays home. Ask us how.</p>
+          </div>
+          <div class="way reveal">
+            <h4>Spread the word</h4>
+            <p>Follow along, share the site, and tell people what we’re building. Early word-of-mouth is worth a lot.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DAF / FUTURE GIVING -->
+    <section class="band">
+      <div class="wrap split">
+        <div class="reveal">
+          <p class="eyebrow">For considered giving</p>
+          <h2 class="section-head">Donor-advised funds &amp; planned gifts.</h2>
+          <p>We’re establishing a donor-advised fund so supporters can give in a tax-smart, flexible way, and so larger or recurring gifts have a solid home. If you already give through a DAF, a family foundation, or a workplace match, we’d love to be on your list.</p>
+          <p>These arrangements are being finalized. Reach out and we’ll share the details as soon as they’re ready — and make sure your intentions are set up the way you want.</p>
+          <div class="btn-row">
+            <a class="btn btn--primary" href="mailto:hello@cvilleglass.org?subject=Donor-advised%20fund%20%2F%20planned%20giving">Start the conversation</a>
+          </div>
+        </div>
+        <div class="glass-figure reveal" aria-hidden="true">
+          <div class="panes">
+            <span class="pane p1" style="right:-8%;top:6%;width:66%;height:54%;"></span>
+            <span class="pane p2" style="right:10%;top:-6%;width:52%;height:66%;"></span>
+            <span class="pane p3" style="right:4%;bottom:-6%;width:58%;height:44%;opacity:.72;"></span>
+          </div>
+          <span class="fig-label">Every gift keeps the fire lit for someone</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- STAY IN TOUCH -->
+    <section class="band band--petrol">
+      <div class="wrap">
+        <div class="section-head reveal" style="max-width:60ch;">
+          <p class="eyebrow">Stay close</p>
+          <h2>Be the first to know.</h2>
+          <p>Programs, open days, and new experiences — we’ll send occasional updates and nothing else. Email us to get on the list, and tell us what you’d want from a community glass studio while you’re at it.</p>
+          <div class="btn-row">
+            <a class="btn btn--amber" href="mailto:hello@cvilleglass.org?subject=Add%20me%20to%20the%20list">Join the list</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div>
+        <a class="brand" href="index.html" aria-label="Charlottesville Glass — home">
+          <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true">
+            <rect width="64" height="64" rx="14" fill="#0e3e39"/>
+            <g style="mix-blend-mode:screen">
+              <rect x="14" y="16" width="30" height="22" rx="5" fill="#a6c8b8" opacity="0.9"/>
+              <rect x="24" y="24" width="26" height="24" rx="5" fill="#c9ded4" opacity="0.75"/>
+              <rect x="18" y="30" width="22" height="18" rx="5" fill="#dd8226" opacity="0.85"/>
+            </g>
+          </svg>
+          <span>Charlottesville&nbsp;<b>Glass</b></span>
+        </a>
+        <p style="margin-top:1rem;max-width:34ch;color:#c9ded4;">A nonprofit glassblowing studio — creation, communication, resilience, and emotional regulation, through glass.</p>
+        <p style="color:#a6c8b8;">201 2nd St NW · Charlottesville, VA 22902</p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <ul class="footer-links">
+          <li><a href="about.html">About</a></li>
+          <li><a href="programs.html">Programs</a></li>
+          <li><a href="experiences.html">Experiences</a></li>
+          <li><a href="get-involved.html">Get involved</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Connect</h4>
+        <ul class="footer-links">
+          <li><a href="mailto:hello@cvilleglass.org">hello@cvilleglass.org</a></li>
+          <li><a href="get-involved.html#support">Support &amp; donate</a></li>
+          <li><a href="https://www.mcguffeyartcenter.com" target="_blank" rel="noopener">McGuffey Art Center &rarr;</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="wrap footer-note">
+      <p>&copy; <span id="year">2026</span> Charlottesville Glass · cvilleglass.org</p>
+      <p>A newly forming nonprofit. Tax-exempt status and online donations coming soon.</p>
+    </div>
+  </footer>
+
+  <script src="assets/main.js"></script>
+  <script src="assets/config.js"></script>
+  <script src="assets/donate.js"></script>
+</body>
+</html>

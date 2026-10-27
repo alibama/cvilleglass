@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Charlottesville Glass">
+  <rect width="64" height="64" rx="14" fill="#0e3e39"/>
+  <g style="mix-blend-mode:screen">
+    <rect x="14" y="16" width="30" height="22" rx="5" fill="#a6c8b8" opacity="0.9"/>
+    <rect x="24" y="24" width="26" height="24" rx="5" fill="#c9ded4" opacity="0.75"/>
+    <rect x="18" y="30" width="22" height="18" rx="5" fill="#dd8226" opacity="0.85"/>
+  </g>
+</svg>
