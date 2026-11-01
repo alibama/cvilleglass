@@ -169,7 +169,7 @@ p { margin: 0 0 1.1rem; max-width: 68ch; }
   display: flex; align-items: center; gap: 0.35rem; list-style: none; margin: 0; padding: 0;
 }
 .nav-links a {
-  text-decoration: none; color: var(--ink); font-weight: 500;
+  text-decoration: none; color: var(--ink); font-weight: 500; white-space: nowrap;
   padding: 0.5rem 0.75rem; border-radius: 999px;
   font-size: var(--step-0);
   transition: background 0.15s ease, color 0.15s ease;
@@ -177,6 +177,7 @@ p { margin: 0 0 1.1rem; max-width: 68ch; }
 .nav-links a:hover { background: var(--paper-2); color: var(--petrol); }
 .nav-links a[aria-current="page"] { color: var(--petrol); background: var(--seaglass-2); }
 .nav-cta { margin-left: 0.4rem; }
+.nav-cta .btn { white-space: nowrap; }
 
 .nav-toggle {
   display: none; background: transparent; border: 1.5px solid var(--petrol);
@@ -185,7 +186,7 @@ p { margin: 0 0 1.1rem; max-width: 68ch; }
 }
 .nav-toggle svg { width: 20px; height: 20px; }
 
-@media (max-width: 860px) {
+@media (max-width: 980px) {
   .nav-toggle { display: inline-flex; }
   .nav-links {
     position: absolute; inset: 100% 0 auto 0;
@@ -590,3 +591,38 @@ p { margin: 0 0 1.1rem; max-width: 68ch; }
 .exp-list { margin: 0.4rem 0 0; padding-left: 1.1rem; color: var(--ink-soft); }
 .exp-list li { margin: 0.25rem 0; }
 .exp-card .btn-row { margin-top: auto; padding-top: 1.2rem; }
+
+/* ---------- residency: photo slots, gallery, facts ---------- */
+/* A .photo-slot is a reserved space for a photo that isn't on the site yet.
+   To use a real photo: drop the photo-slot class, delete the .photo-slot__label,
+   and add an <img> inside the figure (see residency.html for the pattern). */
+.photo-slot {
+  display: grid; place-items: center;
+  border: 1.5px dashed var(--seaglass);
+  background: var(--paper-2) repeating-linear-gradient(135deg, transparent 0 14px, rgba(14,62,57,0.045) 14px 28px);
+}
+.photo-slot__label {
+  text-align: center; padding: 1rem;
+  font-size: var(--step--1); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.photo-slot__label small {
+  display: block; margin-top: 0.35rem;
+  font-family: var(--display); font-style: italic; font-size: 1.05rem;
+  font-weight: 400; letter-spacing: 0; text-transform: none;
+}
+.band--petrol .photo-slot {
+  border-color: #2a7268;
+  background: #0b332f repeating-linear-gradient(135deg, transparent 0 14px, rgba(166,200,184,0.06) 14px 28px);
+}
+.band--petrol .photo-slot__label { color: var(--seaglass-2); }
+
+.gallery { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); }
+.gallery .photo-figure { aspect-ratio: 4 / 3; }
+.gallery .photo-figure--span { grid-column: 1 / -1; aspect-ratio: 16 / 7; }
+@media (max-width: 620px) { .gallery .photo-figure--span { aspect-ratio: 4 / 3; } }
+
+.facts { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr)); margin: 1.4rem 0 0; padding: 0; list-style: none; }
+.facts li { border-top: 2px solid var(--seaglass); padding-top: 0.8rem; }
+.facts b { display: block; font-family: var(--display); font-size: var(--step-1); font-weight: 500; color: var(--petrol); }
+.facts span { font-size: var(--step--1); color: var(--ink-soft); }

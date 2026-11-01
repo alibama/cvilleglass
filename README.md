@@ -70,3 +70,12 @@ To back up the payment records, copy `data/cvilleglass.sqlite`.
   - `GET /api/payments.php?month=YYYY-MM` needs `Authorization: Bearer <token>` and lists paid months and weeks.
 - The same page has a spot for glassdatabase.org keys, saved now for the ornament time-slot sign-ups planned for later.
 - The public pages' header and footer are copied in `app/layout.php`. If you change the nav in the `.html` pages, change it there too.
+
+## Adding residency photos
+
+`public/residency.html` (and the news block on the home page) has reserved photo spaces marked `photo-slot`. Each one has an HTML comment next to it saying exactly what to do:
+
+1. Put the photo in `public/assets/residency/` (JPEG, about 1200 px on the long side, under ~300 KB).
+2. In the `<figure>`, remove the `photo-slot` class and delete the `<span class="photo-slot__label">…</span>` line.
+3. Add the `<img …>` tag from the comment, with a real `alt` description, and edit the `<figcaption>`.
+4. Delete any slot you don't need. Then `git push` and run `bash update.sh` on the server.
