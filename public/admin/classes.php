@@ -1,5 +1,5 @@
 <?php
-// Classes and prices. New classes start as drafts so they can be checked before sharing.
+// Shop rental, classes and prices. New items start as drafts so they can be checked before sharing.
 require __DIR__ . '/../../app/bootstrap.php';
 require_admin();
 $pdo = db();
@@ -12,10 +12,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $used = $pdo->prepare('SELECT COUNT(*) FROM payments WHERE product_id = ?');
         $used->execute([$id]);
         if ($used->fetchColumn()) {
-            flash('That class has payments recorded, so it can’t be deleted. Untick “Published” to hide it instead.', 'error');
+            flash('That one has payments recorded, so it can’t be deleted. Untick “Published” to hide it instead.', 'error');
         } else {
             $pdo->prepare('DELETE FROM products WHERE id = ?')->execute([$id]);
-            flash('Class deleted.');
+            flash('Deleted.');
         }
         redirect('/admin/classes.php');
     }
@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                isset($_POST['visible']) ? 1 : 0, (int)($_POST['sort'] ?? 0)];
 
     if ($name === '' || $price < 50) {
-        flash('A class needs a name and a price of at least $0.50.', 'error');
+        flash('Each item needs a name and a price of at least $0.50.', 'error');
         redirect('/admin/classes.php?edit=' . ($id ?: 'new'));
     }
     if ($id) {
@@ -49,16 +49,16 @@ if (($_GET['edit'] ?? '') === 'new') {
     $editing = product((int)$_GET['edit']);
 }
 
-admin_header('Classes', 'classes');
+admin_header('Rentals & classes', 'classes');
 ?>
 <div class="admin-head">
-  <h1>Classes &amp; prices</h1>
-  <a class="btn btn--primary btn--sm" href="/admin/classes.php?edit=new">+ New class</a>
+  <h1>Shop rental, classes &amp; prices</h1>
+  <a class="btn btn--primary btn--sm" href="/admin/classes.php?edit=new">+ Add new</a>
 </div>
 
 <?php if ($editing): ?>
 <section class="panel">
-  <h2><?= $editing['id'] ? 'Edit ' . h($editing['name']) : 'New class' ?></h2>
+  <h2><?= $editing['id'] ? 'Edit ' . h($editing['name']) : 'New item' ?></h2>
   <form method="post" class="edit-form">
     <?= csrf_field() ?>
     <input type="hidden" name="id" value="<?= (int)$editing['id'] ?>">
@@ -71,7 +71,7 @@ admin_header('Classes', 'classes');
       </select>
     </label>
     <label class="field field--short">Price ($) <input name="price" inputmode="decimal" value="<?= $editing['price_cents'] ? h(rtrim(rtrim(number_format($editing['price_cents'] / 100, 2, '.', ''), '0'), '.')) : '' ?>" required></label>
-    <label class="field field--short">Class date <span class="fine">(one-time classes)</span> <input name="class_date" type="date" value="<?= h($editing['class_date']) ?>"></label>
+    <label class="field field--short">Class date <span class="fine">(classes only, optional)</span> <input name="class_date" type="date" value="<?= h($editing['class_date']) ?>"></label>
     <label class="field">Description <span class="fine">(shown on the pay page)</span>
       <textarea name="description" rows="4"><?= h($editing['description']) ?></textarea>
     </label>
@@ -83,9 +83,9 @@ admin_header('Classes', 'classes');
     </div>
   </form>
   <?php if ($editing['id']): ?>
-    <form method="post" onsubmit="return confirm('Delete this class for good?')" class="danger-zone">
+    <form method="post" onsubmit="return confirm('Delete this for good?')" class="danger-zone">
       <?= csrf_field() ?><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="<?= (int)$editing['id'] ?>">
-      <button class="linkish" type="submit">Delete this class</button>
+      <button class="linkish" type="submit">Delete</button>
     </form>
   <?php endif ?>
 </section>
@@ -94,7 +94,7 @@ admin_header('Classes', 'classes');
 <section class="panel">
   <p class="fine">Price changes apply to new payments only. Drafts are visible to admins on the <a href="/pay/">pay page</a> so you can check them before publishing. Each class has its own link you can share.</p>
   <div class="table-wrap"><table>
-    <thead><tr><th>Class</th><th>Type</th><th class="num">Price</th><th>Date</th><th>Status</th><th>Share link</th><th></th></tr></thead>
+    <thead><tr><th>Name</th><th>Type</th><th class="num">Price</th><th>Date</th><th>Status</th><th>Share link</th><th></th></tr></thead>
     <tbody>
     <?php foreach (products(true) as $p): $link = site_url('/pay/?class=' . $p['id']); ?>
       <tr>

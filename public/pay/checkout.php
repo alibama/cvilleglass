@@ -11,7 +11,7 @@ $back = '/pay/?class=' . $product['id'];
 $student = trim((string)($_POST['student_name'] ?? ''));
 $email = trim((string)($_POST['email'] ?? ''));
 if ($student === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    flash('Please fill in the student’s name and a valid email.', 'error');
+    flash('Please fill in a name and a valid email.', 'error');
     redirect($back);
 }
 

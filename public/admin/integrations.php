@@ -30,10 +30,10 @@ admin_header('Integrations', 'integrations');
 <p class="fine">For developers and partner sites. Everything here is read-only: other systems can look up classes and payments, but can’t change anything.</p>
 
 <section class="panel">
-  <h2>Class list <span class="pill pill--paid">public</span></h2>
-  <p>Published classes and prices as JSON — no key needed. Partner sites can use this to show current classes.</p>
+  <h2>Rentals &amp; classes <span class="pill pill--paid">public</span></h2>
+  <p>Published shop rental and classes, with prices, as JSON — no key needed. Partner sites can use this to show what’s on offer.</p>
   <pre><code>GET <?= h($base) ?>/api/products.php</code></pre>
-  <p class="fine">Each class has <code>id</code>, <code>name</code>, <code>description</code>, <code>kind</code> (monthly / weekly / once), <code>price_cents</code>, <code>class_date</code> and <code>pay_url</code> (a link straight to its payment form).</p>
+  <p class="fine">Each item has <code>id</code>, <code>name</code>, <code>description</code>, <code>category</code> (shop_rental / class), <code>kind</code> (monthly / weekly / once), <code>price_cents</code>, <code>class_date</code> and <code>pay_url</code> (a link straight to its payment form).</p>
 </section>
 
 <section class="panel">

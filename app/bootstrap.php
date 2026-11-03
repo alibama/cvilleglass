@@ -7,7 +7,7 @@ declare(strict_types=1);
 
 date_default_timezone_set('America/New_York');
 
-const CVG_MONTHS_AHEAD = 6;        // how many months a student can pay for at once
+const CVG_MONTHS_AHEAD = 6;        // how many months someone can pay for at once
 const CVG_WEEKS_AHEAD = 8;         // ...and how many weeks
 const CVG_DEFAULT_USER = 'admin';  // backup login until changed in Settings
 const CVG_DEFAULT_PASSWORD = 'password';
@@ -94,13 +94,27 @@ function migrate(PDO $pdo): void
         );
     SQL);
 
-    // Starter classes, hidden until someone checks the details and publishes them.
-    if (!$pdo->query('SELECT COUNT(*) FROM products')->fetchColumn()) {
+    // Starter items, hidden until someone checks the details and publishes them.
+    // Monthly and weekly items are shop rental; one-time items are classes.
+    if ((int)$pdo->query("SELECT value FROM settings WHERE key = 'data_version'")->fetchColumn() >= 2) return;
+    $pdo->exec('BEGIN IMMEDIATE');
+    if ((int)$pdo->query("SELECT value FROM settings WHERE key = 'data_version'")->fetchColumn() < 2) {
         $seed = $pdo->prepare('INSERT INTO products (name, description, kind, price_cents, sort) VALUES (?, ?, ?, ?, ?)');
-        $seed->execute(['Monthly class', 'Weekly studio sessions, paid by the month.', 'monthly', 40000, 1]);
-        $seed->execute(['Weekly class', 'One studio session, paid by the week.', 'weekly', 10000, 2]);
-        $seed->execute(['Special class', 'Add the date, time and what you will make.', 'once', 60000, 3]);
+        if (!$pdo->query('SELECT COUNT(*) FROM products')->fetchColumn()) {
+            $seed->execute(['Monthly shop rental', 'Time in the hot shop, paid by the month.', 'monthly', 40000, 1]);
+            $seed->execute(['Weekly shop rental', 'Time in the hot shop, paid by the week.', 'weekly', 10000, 2]);
+            $seed->execute(['Special class', 'Add the date, time and what you will make.', 'once', 60000, 3]);
+        } else {
+            // Sites set up before Nov 2026 called the rentals "classes". Rename them unless someone already has.
+            $pdo->exec("UPDATE products SET name = 'Monthly shop rental' WHERE name = 'Monthly class' AND kind = 'monthly'");
+            $pdo->exec("UPDATE products SET name = 'Weekly shop rental' WHERE name = 'Weekly class' AND kind = 'weekly'");
+            $pdo->exec("UPDATE products SET description = 'Time in the hot shop, paid by the month.' WHERE description = 'Weekly studio sessions, paid by the month.'");
+            $pdo->exec("UPDATE products SET description = 'Time in the hot shop, paid by the week.' WHERE description = 'One studio session, paid by the week.'");
+        }
+        $seed->execute(['Intro class', 'A first taste of glassblowing. No experience needed.', 'once', 15000, 4]);
+        $pdo->exec("INSERT OR REPLACE INTO settings (key, value) VALUES ('data_version', '2')");
     }
+    $pdo->exec('COMMIT');
 }
 
 // ---------- settings (stored in the database, edited in Admin → Settings) ----------
@@ -207,13 +221,18 @@ function check_csrf(): void
     }
 }
 
-// ---------- classes and the months/weeks they cover ----------
+// ---------- shop rental, classes, and the months/weeks they cover ----------
 
 const CVG_KINDS = [
-    'monthly' => ['label' => 'Monthly', 'per' => 'per month', 'help' => 'Students pick which months they are paying for'],
-    'weekly'  => ['label' => 'Weekly', 'per' => 'per week', 'help' => 'Students pick which weeks they are paying for'],
-    'once'    => ['label' => 'One-time class', 'per' => 'per person', 'help' => 'Students pick how many people'],
+    'monthly' => ['label' => 'Shop rental, monthly', 'per' => 'per month', 'help' => 'People pick which months they’re paying for'],
+    'weekly'  => ['label' => 'Shop rental, weekly', 'per' => 'per week', 'help' => 'People pick which weeks they’re paying for'],
+    'once'    => ['label' => 'Class', 'per' => 'per person', 'help' => 'People pick how many are coming; add a date if it has one'],
 ];
+
+function is_rental(array $product): bool
+{
+    return $product['kind'] !== 'once';
+}
 
 function products(bool $include_hidden = false): array
 {
@@ -228,7 +247,7 @@ function product(int $id): ?array
     return $st->fetch() ?: null;
 }
 
-/** Months/weeks a student can pay for, as [period => label]. $back reaches into the past (for cash entries). */
+/** Months/weeks someone can pay for, as [period => label]. $back reaches into the past (for cash entries). */
 function period_options(string $kind, int $back = 0): array
 {
     $out = [];
@@ -294,7 +313,7 @@ function once_period(array $product): array
     return $date !== '' ? [$date => substr($date, 0, 7)] : ['class-' . date('Y-m') => date('Y-m')];
 }
 
-/** Short text like "Weekly class — Nov 2, Nov 9" for a payment's covered periods. */
+/** Short text like "Weeks of Nov 2, Nov 9" for a payment's covered periods. */
 function covers_text(array $payment, array $periods): string
 {
     if ($payment['kind'] === 'monthly') {

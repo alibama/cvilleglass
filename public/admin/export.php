@@ -7,7 +7,7 @@ header('Content-Type: text/csv; charset=utf-8');
 header('Content-Disposition: attachment; filename="cvilleglass-payments-' . date('Y-m-d') . '.csv"');
 
 $out = fopen('php://output', 'w');
-fputcsv($out, ['Paid on', 'Student', 'Email', 'Class', 'Covers', 'Counts toward month', 'Amount', 'Method', 'Note', 'Stripe payment'], ',', '"', '');
+fputcsv($out, ['Paid on', 'Name', 'Email', 'For', 'Covers', 'Counts toward month', 'Amount', 'Method', 'Note', 'Stripe payment'], ',', '"', '');
 $rows = db()->query("SELECT p.*, pp.period, pp.month, pp.amount_cents AS period_cents
     FROM payment_periods pp JOIN payments p ON p.id = pp.payment_id
     WHERE p.status = 'paid' ORDER BY pp.month, lower(p.student_name)");

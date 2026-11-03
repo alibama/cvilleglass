@@ -1,5 +1,5 @@
 <?php
-// Public, read-only list of published classes. See Admin → Integrations.
+// Public, read-only list of published shop rental and classes. See Admin → Integrations.
 require __DIR__ . '/../../app/bootstrap.php';
 
 header('Content-Type: application/json');
@@ -9,6 +9,7 @@ echo json_encode(['classes' => array_map(fn($p) => [
     'id' => (int)$p['id'],
     'name' => $p['name'],
     'description' => $p['description'],
+    'category' => is_rental($p) ? 'shop_rental' : 'class',
     'kind' => $p['kind'],
     'price_cents' => (int)$p['price_cents'],
     'class_date' => $p['class_date'] ?: null,

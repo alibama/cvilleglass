@@ -104,7 +104,7 @@ function admin_header(string $title, string $active = ''): void
     page_head($title, true);
     $links = [
         'payments' => ['/admin/', 'Payments'],
-        'classes' => ['/admin/classes.php', 'Classes'],
+        'classes' => ['/admin/classes.php', 'Rentals & classes'],
         'admins' => ['/admin/admins.php', 'Admins'],
         'settings' => ['/admin/settings.php', 'Settings & keys'],
         'integrations' => ['/admin/integrations.php', 'Integrations'],

@@ -117,3 +117,5 @@ tr.status-pending td, tr.status-expired td, tr.status-failed td { color: var(--i
 .login-box { max-width: 26rem; margin: 3rem auto; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 2rem; }
 .login-box h1 { margin-bottom: 1.2rem !important; font-size: var(--step-2) !important; }
 .login-box .or { text-align: center; color: var(--ink-soft); font-size: var(--step--1); margin: 1rem 0; }
+.pay-section { margin: 2rem 0 0; }
+.pay-section h2 { font-size: var(--step-3); font-weight: 400; }

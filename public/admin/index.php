@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $amount = $typed === '' ? $standard : (int)round((float)str_replace(['$', ','], '', $typed) * 100);
 
         if (!$product || $student === '' || !$periods) {
-            flash('To record a payment, pick a class, a student name, and at least one month or week.', 'error');
+            flash('To record a payment, pick what it’s for, a name, and at least one month or week.', 'error');
         } else {
             record_payment($product, $student, $email, $periods, $quantity, $amount, 'manual', trim((string)($_POST['note'] ?? '')));
             flash('Recorded ' . money($amount) . ' from ' . $student . '.');
@@ -104,13 +104,13 @@ admin_header('Payments', 'payments');
 <section class="panel">
   <div class="panel-head">
     <h2>Paid for <?= h(month_label($month)) ?></h2>
-    <p class="stat"><b><?= money($total) ?></b> from <?= $students ?> student<?= $students === 1 ? '' : 's' ?></p>
+    <p class="stat"><b><?= money($total) ?></b> from <?= $students ?> <?= $students === 1 ? 'person' : 'people' ?></p>
   </div>
   <?php if (!$rows): ?>
     <p class="empty">No payments for <?= h(month_label($month)) ?> yet.</p>
   <?php else: ?>
     <div class="table-wrap"><table>
-      <thead><tr><th>Student</th><th>Email</th><th>Class</th><th>Covers</th><th class="num">This month</th><th>Paid</th></tr></thead>
+      <thead><tr><th>Name</th><th>Email</th><th>For</th><th>Covers</th><th class="num">This month</th><th>Paid</th></tr></thead>
       <tbody>
       <?php foreach ($rows as $r): ?>
         <tr>
@@ -129,12 +129,12 @@ admin_header('Payments', 'payments');
 </section>
 
 <section class="panel">
-  <div class="panel-head"><h2>Month by month</h2><p class="fine">✓ = monthly · number = weeks paid · ★ = one-time class. Paying ahead shows up in future months.</p></div>
+  <div class="panel-head"><h2>Month by month</h2><p class="fine">✓ = monthly · number = weeks paid · ★ = class. Paying ahead shows up in future months.</p></div>
   <?php if (!$grid): ?>
     <p class="empty">Nobody has paid for these months yet.</p>
   <?php else: ?>
     <div class="table-wrap"><table class="grid">
-      <thead><tr><th>Student</th><?php foreach ($grid_months as $m): ?><th class="<?= $m === $month ? 'is-current' : '' ?>"><a href="/admin/?m=<?= $m ?>"><?= h(date('M Y', strtotime($m . '-01'))) ?></a></th><?php endforeach ?></tr></thead>
+      <thead><tr><th>Name</th><?php foreach ($grid_months as $m): ?><th class="<?= $m === $month ? 'is-current' : '' ?>"><a href="/admin/?m=<?= $m ?>"><?= h(date('M Y', strtotime($m . '-01'))) ?></a></th><?php endforeach ?></tr></thead>
       <tbody>
       <?php foreach ($grid as $g): ?>
         <tr>
@@ -158,14 +158,14 @@ admin_header('Payments', 'payments');
   <form method="post" class="manual-form" data-manual-form>
     <?= csrf_field() ?>
     <input type="hidden" name="action" value="manual">
-    <label class="field">Class
+    <label class="field">For
       <select name="product_id" required>
         <?php foreach ($all_products as $p): ?>
           <option value="<?= $p['id'] ?>" data-kind="<?= h($p['kind']) ?>"><?= h($p['name']) ?> (<?= money((int)$p['price_cents']) ?> <?= CVG_KINDS[$p['kind']]['per'] ?>)</option>
         <?php endforeach ?>
       </select>
     </label>
-    <label class="field">Student’s name <input name="student_name" required></label>
+    <label class="field">Name <input name="student_name" required></label>
     <label class="field">Email <input name="email" type="email"></label>
     <fieldset class="periods" data-kind="monthly"><legend>Months covered</legend>
       <?php foreach (period_options('monthly', 3) as $v => $label): ?>
@@ -187,7 +187,7 @@ admin_header('Payments', 'payments');
 <section class="panel">
   <div class="panel-head"><h2>Recent activity</h2><p class="fine">Every checkout started on the pay page, newest first. “Started” means they opened Stripe but haven’t paid.</p></div>
   <div class="table-wrap"><table>
-    <thead><tr><th>Date</th><th>Student</th><th>Class</th><th>Covers</th><th class="num">Amount</th><th>Status</th><th></th></tr></thead>
+    <thead><tr><th>Date</th><th>Name</th><th>For</th><th>Covers</th><th class="num">Amount</th><th>Status</th><th></th></tr></thead>
     <tbody>
     <?php foreach ($recent as $p): ?>
       <tr class="status-<?= h($p['status']) ?>">
