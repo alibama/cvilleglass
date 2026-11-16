@@ -30,6 +30,7 @@ if command -v apt-get >/dev/null; then
   command -v php >/dev/null || need+=(php)
   php -m 2>/dev/null | grep -qi '^pdo_sqlite$' || need+=(php-sqlite3)
   php -m 2>/dev/null | grep -qi '^curl$' || need+=(php-curl)
+  php -m 2>/dev/null | grep -qi '^dom$' || need+=(php-xml)
   if command -v apache2ctl >/dev/null && ! apache2ctl -M 2>/dev/null | grep -qi 'php'; then
     need+=(libapache2-mod-php)
   fi
@@ -40,6 +41,18 @@ if command -v apt-get >/dev/null; then
     RELOAD=1
   fi
 fi
+
+# 2b. Let residents upload photos and CVs (PHP's default limit is 2 MB) -----
+for dir in /etc/php/*/apache2/conf.d; do
+  [ -d "$dir" ] || continue
+  ini="$dir/99-cvilleglass.ini"
+  want=$'; Charlottesville Glass: residency photo and CV uploads\nupload_max_filesize = 16M\npost_max_size = 64M\nmax_file_uploads = 30'
+  if [ "$(cat "$ini" 2>/dev/null)" != "$want" ]; then
+    say "Raising PHP's upload limit (one time)"
+    printf '%s\n' "$want" | $SUDO tee "$ini" >/dev/null
+    RELOAD=1
+  fi
+done
 
 # 3. A private, writable folder for the database ---------------------------
 mkdir -p "$DATA_DIR" 2>/dev/null || $SUDO mkdir -p "$DATA_DIR"

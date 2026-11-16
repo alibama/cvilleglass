@@ -17,6 +17,7 @@ define('CVG_DATA', getenv('CVG_DATA_DIR') ?: CVG_ROOT . '/data');
 
 require __DIR__ . '/stripe.php';
 require __DIR__ . '/mail.php';
+require __DIR__ . '/residents.php';
 require __DIR__ . '/auth.php';
 require __DIR__ . '/layout.php';
 
@@ -106,11 +107,12 @@ function migrate(PDO $pdo): void
             at INTEGER NOT NULL
         );
     SQL);
+    migrate_residents($pdo);
 
     // Starter items, hidden until someone checks the details and publishes them.
     // Monthly, weekly and hourly items are shop rental; one-time items are classes.
     $version = fn() => (int)$pdo->query("SELECT value FROM settings WHERE key = 'data_version'")->fetchColumn();
-    if ($version() >= 3) return;
+    if ($version() >= 4) return;
     $pdo->exec('BEGIN IMMEDIATE');
     if ($version() < 2) {
         $seed = $pdo->prepare('INSERT INTO products (name, description, kind, price_cents, sort) VALUES (?, ?, ?, ?, ?)');
@@ -132,7 +134,11 @@ function migrate(PDO $pdo): void
         $pdo->exec("INSERT INTO products (name, description, kind, price_cents, visible, sort)
             VALUES ('Member hourly shop rental', 'Hot shop time by the hour, for Charlottesville Glass members.', 'hourly', 8500, 1, 3)");
     }
-    $pdo->exec("INSERT OR REPLACE INTO settings (key, value) VALUES ('data_version', '3')");
+    if ($version() < 4) {
+        // Nov 2026: residency pages moved from residency.html into the database, so residents can edit them.
+        seed_first_resident($pdo);
+    }
+    $pdo->exec("INSERT OR REPLACE INTO settings (key, value) VALUES ('data_version', '4')");
     $pdo->exec('COMMIT');
 }
 

@@ -37,6 +37,13 @@ admin_header('Integrations', 'integrations');
 </section>
 
 <section class="panel">
+  <h2>Residents &amp; glass lineage <span class="pill pill--paid">public</span></h2>
+  <p>Published residents, with their glassdatabase.org profile and the lineage they’ve recorded, as JSON — no key needed.</p>
+  <pre><code>GET <?= h($base) ?>/api/residents.php</code></pre>
+  <p class="fine">Each resident has <code>name</code>, <code>url</code>, <code>year</code>, <code>project_title</code>, <code>summary</code>, <code>gdb_gid</code> / <code>gdb_url</code>, <code>headshot_url</code>, <code>cv_url</code> and <code>lineage</code>. Lineage rows use the same fields as glassdatabase.org’s lineage form — <code>student_name</code>, <code>mentor_name</code>, <code>relation</code> (Studied under, Apprenticed to, Assisted, Took a class / workshop from, Collaborated with), <code>where</code>, <code>years</code>, <code>note</code> — plus <code>student_gid</code> / <code>mentor_gid</code> when someone is linked and a <code>source</code> link back here.</p>
+</section>
+
+<section class="panel">
   <h2>Payments <span class="pill pill--pending">needs token</span></h2>
   <p>Who has paid, one row per month or week covered. Send the token in a header:</p>
   <pre><code>curl -H "Authorization: Bearer <?= $token !== '' ? h($token) : 'YOUR_TOKEN' ?>" \

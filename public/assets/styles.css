@@ -595,7 +595,7 @@ p { margin: 0 0 1.1rem; max-width: 68ch; }
 /* ---------- residency: photo slots, gallery, facts ---------- */
 /* A .photo-slot is a reserved space for a photo that isn't on the site yet.
    To use a real photo: drop the photo-slot class, delete the .photo-slot__label,
-   and add an <img> inside the figure (see residency.html for the pattern). */
+   and add an <img> inside the figure (see the home page for the pattern). */
 .photo-slot {
   display: grid; place-items: center;
   border: 1.5px dashed var(--seaglass);

@@ -1,2 +1,2 @@
-Photos from the residencies go here.
-See README.md ("Adding residency photos") for the sizes and how to swap them into residency.html.
+Photos used by the static pages (e.g. the home page news block) go here.
+Residents upload their own photos through their residency page editor; those are stored in data/uploads/.

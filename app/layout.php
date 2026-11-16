@@ -48,6 +48,7 @@ function public_header(string $title): void
         <li><a href="/about.html">About</a></li>
         <li><a href="/programs.html">Programs</a></li>
         <li><a href="/experiences.html">Experiences</a></li>
+        <li><a href="/residency/">Residency</a></li>
         <li><a href="/get-involved.html">Get involved</a></li>
         <li><a href="/contact.php">Contact</a></li>
         <li class="nav-cta"><a class="btn btn--amber" href="/get-involved.html#support">Support us</a></li>
@@ -75,6 +76,7 @@ function public_footer(): void
           <li><a href="/about.html">About</a></li>
           <li><a href="/programs.html">Programs</a></li>
           <li><a href="/experiences.html">Experiences</a></li>
+          <li><a href="/residency/">Residency</a></li>
           <li><a href="/get-involved.html">Get involved</a></li>
           <li><a href="/contact.php">Contact</a></li>
         </ul>
@@ -105,6 +107,7 @@ function admin_header(string $title, string $active = ''): void
     $links = [
         'payments' => ['/admin/', 'Payments'],
         'messages' => ['/admin/messages.php', 'Messages'],
+        'residents' => ['/admin/residents.php', 'Residents'],
         'classes' => ['/admin/classes.php', 'Rentals & classes'],
         'admins' => ['/admin/admins.php', 'Admins'],
         'settings' => ['/admin/settings.php', 'Settings & keys'],

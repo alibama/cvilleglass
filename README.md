@@ -77,11 +77,17 @@ To back up the payment records, copy `data/cvilleglass.sqlite`.
 - The same page has a spot for glassdatabase.org keys, saved now for the ornament time-slot sign-ups planned for later.
 - The public pages' header and footer are copied in `app/layout.php`. If you change the nav in the `.html` pages, change it there too.
 
-## Adding residency photos
+## Residency pages
 
-`public/residency.html` (and the news block on the home page) has reserved photo spaces marked `photo-slot`. Each one has an HTML comment next to it saying exactly what to do:
+Each resident edits their own page: their bio and a write-up of the residency (a simple editor that handles text pasted from Word or Google Docs), a headshot, work photos with captions, a CV (PDF), a link to their glassdatabase.org profile, and their **glass lineage**, meaning who they studied under, assisted, or were assisted by.
 
-1. Put the photo in `public/assets/residency/` (JPEG, about 1200 px on the long side, under ~300 KB).
-2. In the `<figure>`, remove the `photo-slot` class and delete the `<span class="photo-slot__label">…</span>` line.
-3. Add the `<img …>` tag from the comment, with a real `alt` description, and edit the `<figcaption>`.
-4. Delete any slot you don't need. Then `git push` and run `bash update.sh` on the server.
+1. **Admin → Residents → Add a resident** (name, email, year). Their page starts as a draft.
+2. Click **Email them an edit link**, or **Make a new link to copy** and send it yourself. The link signs them in with no password. Making a new link turns off the old one.
+3. Tick **Published** when the page is ready. After that, their changes go live straight away, and you get an email (at most once an hour) when someone updates a page.
+4. **Edit page yourself** opens the same editor for you.
+
+The pages live at `/residency/` (program and all residents) and `/residency/artist.php?r=name`. The old `residency.html` redirects there. Photos and CVs are stored in `data/uploads/`, so back that folder up along with the database. `update.sh` raises PHP's upload limit to 16 MB per file the first time it runs. Photos are also shrunk in the browser before uploading, which removes phone location data.
+
+The lineage and glassdatabase.org links are published as JSON at `/api/residents.php`, in the same fields as glassdatabase.org's lineage form. Admin → Integrations has the details.
+
+The rich-text editor is [Quill](https://quilljs.com) 2.0.3, loaded from jsDelivr with an integrity hash. Everything it sends is cleaned on the server (`clean_html()` in `app/residents.php`), so only paragraphs, headings, bold/italic, lists, quotes and links are kept.
