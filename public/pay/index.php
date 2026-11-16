@@ -1,6 +1,7 @@
 <?php
-// Public page: shop rental (pick months/weeks) and classes (pick how many people), paid with Stripe.
-// Share /pay/ for everything, or /pay/?class=ID for a single item.
+// Public page: shop rental (pick months/weeks, or hours for members), classes (pick how many people)
+// and an open donation box, paid with Stripe.
+// Share /pay/ for everything, /pay/?class=ID for a single item, or /pay/#donate for the donation box.
 require __DIR__ . '/../../app/bootstrap.php';
 
 $admin = current_admin();
@@ -11,6 +12,7 @@ if (isset($_GET['class'])) {
 $rentals = array_values(array_filter($items, 'is_rental'));
 $classes = array_values(array_filter($items, fn($p) => !is_rental($p)));
 $classes_only = $classes && !$rentals;
+$show_donate = !isset($_GET['class']);
 
 function pay_card(array $p): void
 {
@@ -35,7 +37,11 @@ function pay_card(array $p): void
             <input name="email" type="email" required autocomplete="email" maxlength="200">
           </label>
 
-          <?php if (!is_rental($p)): ?>
+          <?php if ($p['kind'] === 'hourly'): ?>
+            <label class="field field--short">How many hours?
+              <input name="quantity" type="number" min="1" max="40" value="1" required>
+            </label>
+          <?php elseif (!is_rental($p)): ?>
             <label class="field field--short">How many people?
               <input name="quantity" type="number" min="1" max="10" value="1" required>
             </label>
@@ -67,7 +73,7 @@ public_header($classes_only ? 'Classes' : 'Shop rental');
     <?php else: ?>
       <p class="eyebrow">Hot shop</p>
       <h1>Shop rental.</h1>
-      <p class="lead">Rent time in the hot shop by the month or by the week. Pick the months or weeks you’re paying for — paying ahead is always welcome. Payment is handled securely by Stripe, and you’ll get a receipt by email.</p>
+      <p class="lead">Rent time in the hot shop by the month or by the week, or by the hour if you’re a member. Pick the months, weeks or hours you’re paying for — paying ahead is always welcome. Payment is handled securely by Stripe, and you’ll get a receipt by email.</p>
     <?php endif ?>
   </div>
 </section>
@@ -82,7 +88,7 @@ public_header($classes_only ? 'Classes' : 'Shop rental');
       <p class="flash flash--info">You’re signed in as an admin, so drafts are shown here too. Visitors only see published items. <a href="/admin/classes.php">Edit rentals &amp; classes</a></p>
     <?php endif ?>
 
-    <?php if (!$items): ?>
+    <?php if (!$items && !$show_donate): ?>
       <div class="notice">
         <h3>Nothing open for payment right now.</h3>
         <p>Questions? Email <a class="tlink" href="mailto:<?= h(contact_email()) ?>"><?= h(contact_email()) ?></a>.</p>
@@ -99,6 +105,34 @@ public_header($classes_only ? 'Classes' : 'Shop rental');
       </div>
     <?php endif ?>
     <?php foreach ($classes as $p) pay_card($p) ?>
+
+    <?php if ($show_donate): ?>
+      <div class="section-head pay-section" id="donate">
+        <p class="eyebrow">Give</p>
+        <h2>Donate.</h2>
+        <p>Charlottesville Glass is a nonprofit. Any amount helps keep the furnace lit.</p>
+      </div>
+      <article class="pay-card">
+        <div class="pay-card-info">
+          <h2>Make a donation</h2>
+          <p>Give whatever amount you like. You’ll get an emailed receipt for your records.</p>
+        </div>
+        <form class="pay-form" method="post" action="/pay/checkout.php" data-donate>
+          <input type="hidden" name="donation" value="1">
+          <label class="field">Your name
+            <input name="student_name" required autocomplete="name" maxlength="120">
+          </label>
+          <label class="field">Email for the receipt
+            <input name="email" type="email" required autocomplete="email" maxlength="200">
+          </label>
+          <label class="field field--short">Amount (US dollars)
+            <span class="money-input"><span aria-hidden="true">$</span><input name="amount" type="number" inputmode="decimal" min="<?= CVG_DONATION_MIN / 100 ?>" max="<?= CVG_DONATION_MAX / 100 ?>" step="0.01" placeholder="50" required></span>
+          </label>
+          <button class="btn btn--amber" type="submit" data-pay-button>Donate</button>
+          <p class="fine">You’ll finish on Stripe’s secure checkout page.</p>
+        </form>
+      </article>
+    <?php endif ?>
   </div>
 </section>
 <?php

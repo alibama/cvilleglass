@@ -25,7 +25,10 @@ public_header('Thank you');
   <div class="panes" aria-hidden="true"><span class="pane p1"></span><span class="pane p2"></span><span class="pane p3"></span></div>
   <div class="wrap">
     <p class="eyebrow">Payment</p>
-    <?php if ($payment && $payment['status'] === 'paid'): ?>
+    <?php if ($payment && $payment['status'] === 'paid' && $payment['kind'] === 'donation'): ?>
+      <h1>Thank you, <?= h(strtok($payment['student_name'], ' ')) ?>.</h1>
+      <p class="lead">Your gift of <b><?= money((int)$payment['amount_cents']) ?></b> helps keep Charlottesville Glass going. A receipt is on its way to <?= h($payment['email']) ?>.</p>
+    <?php elseif ($payment && $payment['status'] === 'paid'): ?>
       <h1>Thank you, <?= h(strtok($payment['student_name'], ' ')) ?>.</h1>
       <p class="lead">You’re paid up for <b><?= h($payment['product_name']) ?></b> — <?= h(covers_text($payment, $periods)) ?>. A receipt is on its way to <?= h($payment['email']) ?>.</p>
     <?php elseif ($payment): ?>

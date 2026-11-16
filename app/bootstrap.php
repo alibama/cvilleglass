@@ -51,7 +51,7 @@ function migrate(PDO $pdo): void
             id          INTEGER PRIMARY KEY,
             name        TEXT NOT NULL,
             description TEXT NOT NULL DEFAULT '',
-            kind        TEXT NOT NULL,          -- monthly | weekly | once
+            kind        TEXT NOT NULL,          -- monthly | weekly | hourly | once
             price_cents INTEGER NOT NULL,
             class_date  TEXT NOT NULL DEFAULT '', -- YYYY-MM-DD, one-time classes only
             visible     INTEGER NOT NULL DEFAULT 0,
@@ -59,7 +59,7 @@ function migrate(PDO $pdo): void
         );
         CREATE TABLE IF NOT EXISTS payments (
             id            INTEGER PRIMARY KEY,
-            product_id    INTEGER REFERENCES products(id),
+            product_id    INTEGER REFERENCES products(id), -- NULL for donations
             product_name  TEXT NOT NULL,        -- copied so renaming a class keeps history
             kind          TEXT NOT NULL,
             student_name  TEXT NOT NULL,
@@ -76,7 +76,8 @@ function migrate(PDO $pdo): void
         );
         CREATE TABLE IF NOT EXISTS payment_periods (
             payment_id   INTEGER NOT NULL REFERENCES payments(id) ON DELETE CASCADE,
-            period       TEXT NOT NULL,   -- YYYY-MM (monthly), Monday YYYY-MM-DD (weekly), class date (once)
+            period       TEXT NOT NULL,   -- YYYY-MM (monthly), Monday YYYY-MM-DD (weekly), class date (once),
+                                          -- hours-YYYY-MM (hourly), donation-YYYY-MM (donations)
             month        TEXT NOT NULL,   -- YYYY-MM this payment counts toward
             amount_cents INTEGER NOT NULL,
             PRIMARY KEY (payment_id, period)
@@ -95,10 +96,11 @@ function migrate(PDO $pdo): void
     SQL);
 
     // Starter items, hidden until someone checks the details and publishes them.
-    // Monthly and weekly items are shop rental; one-time items are classes.
-    if ((int)$pdo->query("SELECT value FROM settings WHERE key = 'data_version'")->fetchColumn() >= 2) return;
+    // Monthly, weekly and hourly items are shop rental; one-time items are classes.
+    $version = fn() => (int)$pdo->query("SELECT value FROM settings WHERE key = 'data_version'")->fetchColumn();
+    if ($version() >= 3) return;
     $pdo->exec('BEGIN IMMEDIATE');
-    if ((int)$pdo->query("SELECT value FROM settings WHERE key = 'data_version'")->fetchColumn() < 2) {
+    if ($version() < 2) {
         $seed = $pdo->prepare('INSERT INTO products (name, description, kind, price_cents, sort) VALUES (?, ?, ?, ?, ?)');
         if (!$pdo->query('SELECT COUNT(*) FROM products')->fetchColumn()) {
             $seed->execute(['Monthly shop rental', 'Time in the hot shop, paid by the month.', 'monthly', 40000, 1]);
@@ -112,8 +114,13 @@ function migrate(PDO $pdo): void
             $pdo->exec("UPDATE products SET description = 'Time in the hot shop, paid by the week.' WHERE description = 'One studio session, paid by the week.'");
         }
         $seed->execute(['Intro class', 'A first taste of glassblowing. No experience needed.', 'once', 15000, 4]);
-        $pdo->exec("INSERT OR REPLACE INTO settings (key, value) VALUES ('data_version', '2')");
     }
+    if ($version() < 3) {
+        // Nov 2026: hourly shop time for members, published straight away.
+        $pdo->exec("INSERT INTO products (name, description, kind, price_cents, visible, sort)
+            VALUES ('Member hourly shop rental', 'Hot shop time by the hour, for Charlottesville Glass members.', 'hourly', 8500, 1, 3)");
+    }
+    $pdo->exec("INSERT OR REPLACE INTO settings (key, value) VALUES ('data_version', '3')");
     $pdo->exec('COMMIT');
 }
 
@@ -226,12 +233,28 @@ function check_csrf(): void
 const CVG_KINDS = [
     'monthly' => ['label' => 'Shop rental, monthly', 'per' => 'per month', 'help' => 'People pick which months they’re paying for'],
     'weekly'  => ['label' => 'Shop rental, weekly', 'per' => 'per week', 'help' => 'People pick which weeks they’re paying for'],
+    'hourly'  => ['label' => 'Shop rental, hourly', 'per' => 'per hour', 'help' => 'People pick how many hours they’re paying for'],
     'once'    => ['label' => 'Class', 'per' => 'per person', 'help' => 'People pick how many are coming; add a date if it has one'],
 ];
 
 function is_rental(array $product): bool
 {
     return $product['kind'] !== 'once';
+}
+
+/** Priced per person (classes) or per hour, rather than per month/week picked from a list. */
+function is_counted(string $kind): bool
+{
+    return $kind === 'once' || $kind === 'hourly';
+}
+
+const CVG_DONATION_MIN = 100;       // $1
+const CVG_DONATION_MAX = 2500000;   // $25,000 — bigger gifts are better by check
+
+/** What a donation is recorded against, in place of a product. */
+function donation_product(): array
+{
+    return ['id' => null, 'name' => 'Donation', 'kind' => 'donation', 'price_cents' => 0, 'class_date' => ''];
 }
 
 function products(bool $include_hidden = false): array
@@ -271,6 +294,8 @@ function period_label(string $kind, string $period): string
 {
     if ($kind === 'monthly') return date('F Y', strtotime($period . '-01'));
     if ($kind === 'weekly') return 'Week of ' . date('M j', strtotime($period));
+    if ($kind === 'hourly') return 'Hourly shop time';
+    if ($kind === 'donation') return 'Donation';
     return preg_match('/^\d{4}-\d{2}-\d{2}$/', $period) ? date('D, M j, Y', strtotime($period)) : 'Class';
 }
 
@@ -306,9 +331,14 @@ function record_payment(array $product, string $student, string $email, array $p
     return $id;
 }
 
-/** [period => month] for a one-time class: counts toward the class month, or this month if no date is set. */
+/**
+ * [period => month] for anything paid by count rather than by picked months/weeks.
+ * A class counts toward its class month (or this month if no date is set); hourly time and donations count toward this month.
+ */
 function once_period(array $product): array
 {
+    if ($product['kind'] === 'hourly') return ['hours-' . date('Y-m') => date('Y-m')];
+    if ($product['kind'] === 'donation') return ['donation-' . date('Y-m') => date('Y-m')];
     $date = $product['class_date'];
     return $date !== '' ? [$date => substr($date, 0, 7)] : ['class-' . date('Y-m') => date('Y-m')];
 }
@@ -322,6 +352,10 @@ function covers_text(array $payment, array $periods): string
     if ($payment['kind'] === 'weekly') {
         return 'Weeks of ' . implode(', ', array_map(fn($p) => date('M j', strtotime($p)), $periods));
     }
+    if ($payment['kind'] === 'hourly') {
+        return $payment['quantity'] . ($payment['quantity'] == 1 ? ' hour' : ' hours');
+    }
+    if ($payment['kind'] === 'donation') return 'Donation';
     $label = period_label('once', $periods[0] ?? '');
     return ($payment['quantity'] > 1 ? $payment['quantity'] . ' people · ' : '') . $label;
 }

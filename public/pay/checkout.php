@@ -4,9 +4,15 @@ require __DIR__ . '/../../app/bootstrap.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') redirect('/pay/');
 
-$product = product((int)($_POST['product_id'] ?? 0));
-if (!$product || (!$product['visible'] && !current_admin())) redirect('/pay/');
-$back = '/pay/?class=' . $product['id'];
+$donation = !empty($_POST['donation']);
+if ($donation) {
+    $product = donation_product();
+    $back = '/pay/#donate';
+} else {
+    $product = product((int)($_POST['product_id'] ?? 0));
+    if (!$product || (!$product['visible'] && !current_admin())) redirect('/pay/');
+    $back = '/pay/?class=' . $product['id'];
+}
 
 $student = trim((string)($_POST['student_name'] ?? ''));
 $email = trim((string)($_POST['email'] ?? ''));
@@ -17,8 +23,15 @@ if ($student === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
 
 // Work out what is being paid for: [period => month it counts toward]
 $quantity = 1;
-if ($product['kind'] === 'once') {
-    $quantity = max(1, min(10, (int)($_POST['quantity'] ?? 1)));
+if ($donation) {
+    $price = (int)round((float)str_replace(['$', ','], '', (string)($_POST['amount'] ?? '')) * 100);
+    if ($price < CVG_DONATION_MIN || $price > CVG_DONATION_MAX) {
+        flash('Please enter a donation between ' . money(CVG_DONATION_MIN) . ' and ' . money(CVG_DONATION_MAX) . '. For larger gifts, email ' . contact_email() . '.', 'error');
+        redirect($back);
+    }
+    $periods = once_period($product);
+} elseif (is_counted($product['kind'])) {
+    $quantity = max(1, min($product['kind'] === 'hourly' ? 40 : 10, (int)($_POST['quantity'] ?? 1)));
     $periods = once_period($product);
 } else {
     $allowed = period_options($product['kind']);
@@ -36,13 +49,17 @@ if (setting('stripe_secret_key') === '') {
     redirect($back);
 }
 
-$price = (int)$product['price_cents'];
-$count = $product['kind'] === 'once' ? $quantity : count($periods);
+$price ??= (int)$product['price_cents'];
+$count = is_counted($product['kind']) || $donation ? $quantity : count($periods);
 $payment_id = record_payment($product, $student, $email, $periods, $quantity, $price * $count, 'stripe');
 
 // One receipt line per month/week, so the receipt shows exactly what was covered.
 $lines = [];
-if ($product['kind'] === 'once') {
+if ($donation) {
+    $lines[] = ['name' => 'Donation to Charlottesville Glass', 'qty' => 1];
+} elseif ($product['kind'] === 'hourly') {
+    $lines[] = ['name' => $product['name'] . ' (hours)', 'qty' => $quantity];
+} elseif ($product['kind'] === 'once') {
     $name = $product['name'] . ($product['class_date'] ? ' — ' . period_label('once', $product['class_date']) : '');
     $lines[] = ['name' => $name, 'qty' => $quantity];
 } else {
@@ -55,7 +72,7 @@ $params = [
     'customer_email' => $email,
     'client_reference_id' => (string)$payment_id,
     'success_url' => site_url('/pay/thanks.php?session_id={CHECKOUT_SESSION_ID}'),
-    'cancel_url' => site_url('/pay/?cancelled=1&class=' . $product['id']),
+    'cancel_url' => site_url($donation ? '/pay/?cancelled=1#donate' : '/pay/?cancelled=1&class=' . $product['id']),
     'metadata' => ['payment_id' => $payment_id, 'student' => $student],
     'payment_intent_data' => [
         'description' => $product['name'] . ' — ' . $student,
@@ -63,6 +80,7 @@ $params = [
     ],
     'line_items' => [],
 ];
+if ($donation) $params['submit_type'] = 'donate';
 foreach ($lines as $line) {
     $params['line_items'][] = [
         'quantity' => $line['qty'],

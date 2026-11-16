@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = trim((string)($_POST['email'] ?? ''));
         $periods = [];
         $quantity = 1;
-        if ($product && $product['kind'] === 'once') {
+        if ($product && is_counted($product['kind'])) {
             $quantity = max(1, (int)($_POST['quantity'] ?? 1));
             $periods = once_period($product);
         } elseif ($product) {
@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $periods[$p] = substr($p, 0, 7);
             }
         }
-        $standard = $product ? (int)$product['price_cents'] * ($product['kind'] === 'once' ? $quantity : count($periods)) : 0;
+        $standard = $product ? (int)$product['price_cents'] * (is_counted($product['kind']) ? $quantity : count($periods)) : 0;
         $typed = trim((string)($_POST['amount'] ?? ''));
         $amount = $typed === '' ? $standard : (int)round((float)str_replace(['$', ','], '', $typed) * 100);
 
@@ -129,7 +129,7 @@ admin_header('Payments', 'payments');
 </section>
 
 <section class="panel">
-  <div class="panel-head"><h2>Month by month</h2><p class="fine">✓ = monthly · number = weeks paid · ★ = class. Paying ahead shows up in future months.</p></div>
+  <div class="panel-head"><h2>Month by month</h2><p class="fine">✓ = monthly · number = weeks paid · hrs = hourly · ★ = class · ♥ = donation. Paying ahead shows up in future months.</p></div>
   <?php if (!$grid): ?>
     <p class="empty">Nobody has paid for these months yet.</p>
   <?php else: ?>
@@ -143,6 +143,8 @@ admin_header('Payments', 'payments');
             <td class="<?= $m === $month ? 'is-current' : '' ?>">
               <?php if (isset($cell['monthly'])): ?><span class="mark mark--month" title="<?= h(implode(', ', array_unique($cell['monthly']))) ?>">✓</span><?php endif ?>
               <?php if (isset($cell['weekly'])): ?><span class="mark mark--week" title="<?= h(implode(', ', array_unique($cell['weekly']))) ?>"><?= count($cell['weekly']) ?> wk</span><?php endif ?>
+              <?php if (isset($cell['hourly'])): ?><span class="mark mark--week" title="<?= h(implode(', ', array_unique($cell['hourly']))) ?>">hrs</span><?php endif ?>
+              <?php if (isset($cell['donation'])): ?><span class="mark mark--once" title="Donation">♥</span><?php endif ?>
               <?php if (isset($cell['once'])): ?><span class="mark mark--once" title="<?= h(implode(', ', array_unique($cell['once']))) ?>">★</span><?php endif ?>
             </td>
           <?php endforeach ?>
@@ -177,7 +179,7 @@ admin_header('Payments', 'payments');
         <label class="check"><input type="checkbox" name="periods_weekly[]" value="<?= h($v) ?>"> <?= h($label) ?></label>
       <?php endforeach ?>
     </fieldset>
-    <label class="field field--short" data-kind="once">How many people <input name="quantity" type="number" min="1" value="1"></label>
+    <label class="field field--short" data-kind="once hourly">How many people or hours <input name="quantity" type="number" min="1" value="1"></label>
     <label class="field field--short">Amount received <input name="amount" inputmode="decimal" placeholder="standard price"></label>
     <label class="field">Note <input name="note" placeholder="e.g. check #1042"></label>
     <button class="btn btn--primary" type="submit">Record payment</button>
