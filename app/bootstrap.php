@@ -153,6 +153,13 @@ function money(int $cents): string
     return '$' . number_format($cents / 100, $cents % 100 ? 2 : 0);
 }
 
+/** /assets/ link with the file's modified time, so browsers fetch the new copy after an update. */
+function asset(string $file): string
+{
+    $mtime = @filemtime(CVG_ROOT . '/public/assets/' . $file);
+    return '/assets/' . $file . ($mtime ? '?v=' . $mtime : '');
+}
+
 function now(): string
 {
     return date('Y-m-d H:i:s');

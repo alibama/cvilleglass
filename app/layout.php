@@ -18,8 +18,8 @@ function page_head(string $title, bool $noindex = false): void
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/assets/styles.css" />
-  <link rel="stylesheet" href="/assets/pay.css" />
+  <link rel="stylesheet" href="<?= asset('styles.css') ?>" />
+  <link rel="stylesheet" href="<?= asset('pay.css') ?>" />
 </head>
 <?php
 }
@@ -92,8 +92,8 @@ function public_footer(): void
       <p>&copy; <span id="year"><?= date('Y') ?></span> Charlottesville Glass · cvilleglass.org</p>
     </div>
   </footer>
-  <script src="/assets/main.js"></script>
-  <script src="/assets/pay.js"></script>
+  <script src="<?= asset('main.js') ?>"></script>
+  <script src="<?= asset('pay.js') ?>"></script>
 </body>
 </html>
 <?php
@@ -141,7 +141,7 @@ function admin_footer(): void
 {
     ?>
   </main>
-  <script src="/assets/pay.js"></script>
+  <script src="<?= asset('pay.js') ?>"></script>
 </body>
 </html>
 <?php
