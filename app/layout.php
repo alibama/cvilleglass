@@ -49,7 +49,7 @@ function public_header(string $title): void
         <li><a href="/programs.html">Programs</a></li>
         <li><a href="/experiences.html">Experiences</a></li>
         <li><a href="/get-involved.html">Get involved</a></li>
-        <li><a href="/contact.html">Contact</a></li>
+        <li><a href="/contact.php">Contact</a></li>
         <li class="nav-cta"><a class="btn btn--amber" href="/get-involved.html#support">Support us</a></li>
       </ul>
     </nav>
@@ -76,13 +76,13 @@ function public_footer(): void
           <li><a href="/programs.html">Programs</a></li>
           <li><a href="/experiences.html">Experiences</a></li>
           <li><a href="/get-involved.html">Get involved</a></li>
-          <li><a href="/contact.html">Contact</a></li>
+          <li><a href="/contact.php">Contact</a></li>
         </ul>
       </div>
       <div>
         <h4>Connect</h4>
         <ul class="footer-links">
-          <li><a href="mailto:<?= h(contact_email()) ?>"><?= h(contact_email()) ?></a></li>
+          <li><a href="/contact.php">Send us a message</a></li>
           <li><a href="/get-involved.html#support">Support &amp; donate</a></li>
           <li><a href="https://www.mcguffeyartcenter.com" target="_blank" rel="noopener">McGuffey Art Center &rarr;</a></li>
         </ul>
@@ -104,6 +104,7 @@ function admin_header(string $title, string $active = ''): void
     page_head($title, true);
     $links = [
         'payments' => ['/admin/', 'Payments'],
+        'messages' => ['/admin/messages.php', 'Messages'],
         'classes' => ['/admin/classes.php', 'Rentals & classes'],
         'admins' => ['/admin/admins.php', 'Admins'],
         'settings' => ['/admin/settings.php', 'Settings & keys'],

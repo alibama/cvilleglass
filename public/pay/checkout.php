@@ -26,7 +26,7 @@ $quantity = 1;
 if ($donation) {
     $price = (int)round((float)str_replace(['$', ','], '', (string)($_POST['amount'] ?? '')) * 100);
     if ($price < CVG_DONATION_MIN || $price > CVG_DONATION_MAX) {
-        flash('Please enter a donation between ' . money(CVG_DONATION_MIN) . ' and ' . money(CVG_DONATION_MAX) . '. For larger gifts, email ' . contact_email() . '.', 'error');
+        flash('Please enter a donation between ' . money(CVG_DONATION_MIN) . ' and ' . money(CVG_DONATION_MAX) . '. For larger gifts, get in touch through the contact page.', 'error');
         redirect($back);
     }
     $periods = once_period($product);
@@ -45,7 +45,7 @@ if ($donation) {
 }
 
 if (setting('stripe_secret_key') === '') {
-    flash('Online payment isn’t switched on yet. Please email ' . contact_email() . ' to pay another way.', 'error');
+    flash('Online payment isn’t switched on yet. Please get in touch through the contact page to pay another way.', 'error');
     redirect($back);
 }
 
@@ -93,7 +93,7 @@ try {
 } catch (RuntimeException $e) {
     error_log('cvilleglass checkout: ' . $e->getMessage());
     db()->prepare("UPDATE payments SET status = 'failed', note = ? WHERE id = ?")->execute([$e->getMessage(), $payment_id]);
-    flash('Sorry — online payment isn’t working right now. Please email ' . contact_email() . ' and we’ll sort it out.', 'error');
+    flash('Sorry — online payment isn’t working right now. Please get in touch through the contact page and we’ll sort it out.', 'error');
     redirect($back);
 }
 

@@ -91,7 +91,7 @@ public_header($classes_only ? 'Classes' : 'Shop rental');
     <?php if (!$items && !$show_donate): ?>
       <div class="notice">
         <h3>Nothing open for payment right now.</h3>
-        <p>Questions? Email <a class="tlink" href="mailto:<?= h(contact_email()) ?>"><?= h(contact_email()) ?></a>.</p>
+        <p>Questions? <a class="tlink" href="/contact.php?subject=Payment%20question">Send us a message</a>.</p>
       </div>
     <?php endif ?>
 

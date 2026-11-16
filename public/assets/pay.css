@@ -54,6 +54,10 @@
 .pay-form { display: grid; gap: 1rem; align-content: start; }
 .pay-form .btn { justify-self: start; }
 .pay-form .fine { margin: -0.4rem 0 0; }
+.hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+.message { padding-block: 0.4rem 1rem; border-bottom: 1px solid var(--line); margin-bottom: 1rem; }
+.message:last-child { border-bottom: 0; margin-bottom: 0; }
+.message-body { white-space: normal; max-width: 70ch; }
 .money-input { position: relative; display: block; }
 .money-input > span { position: absolute; left: 0.8rem; top: 50%; transform: translateY(-50%); font-weight: 400; color: var(--ink-soft); }
 .field .money-input input { padding-left: 1.6rem; }

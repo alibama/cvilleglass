@@ -78,7 +78,7 @@
       })
       .catch(function () {
         if (btn) { btn.removeAttribute("disabled"); btn.textContent = label; }
-        window.alert("Sorry — we couldn't start the donation. Please email hello@cvilleglass.org and we'll help.");
+        window.alert("Sorry — we couldn't start the donation. Please send us a message from the Contact page and we'll help.");
       });
   });
 

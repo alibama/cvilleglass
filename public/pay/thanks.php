@@ -36,7 +36,7 @@ public_header('Thank you');
       <p class="lead">Some payment types (like bank transfers) take a few days to clear. You’ll get an email from Stripe when it does.</p>
     <?php else: ?>
       <h1>Thank you.</h1>
-      <p class="lead">If you just paid, a receipt is on its way to your email. Questions? Write to <a class="tlink" href="mailto:<?= h(contact_email()) ?>"><?= h(contact_email()) ?></a>.</p>
+      <p class="lead">If you just paid, a receipt is on its way to your email. Questions? <a class="tlink" href="/contact.php?subject=Payment%20question">Send us a message</a>.</p>
     <?php endif ?>
     <div class="btn-row"><a class="btn btn--primary" href="/">Back to the site</a><a class="btn btn--ghost" href="/pay/">Pay for something else</a></div>
   </div>

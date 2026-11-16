@@ -8,7 +8,8 @@ require_admin();
 $sections = [
     'stripe' => ['stripe_secret_key' => true, 'stripe_webhook_secret' => true],
     'google' => ['google_client_id' => false, 'google_client_secret' => true],
-    'site' => ['site_url' => false, 'contact_email' => false],
+    'site' => ['site_url' => false],
+    'contact' => ['contact_form_to' => false, 'smtp_user' => false, 'smtp_password' => true, 'smtp_host' => false, 'smtp_port' => false],
 ];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -33,6 +34,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             flash($e->getMessage(), 'error');
         }
         redirect('/admin/settings.php#stripe');
+    }
+
+    if ($action === 'test_email') {
+        try {
+            send_mail(contact_to(), 'Test from the Charlottesville Glass website',
+                "This is a test from Admin → Settings. If you can read it, contact-form messages will reach this inbox.\n");
+            flash('Test email sent to ' . contact_to() . '. Check that inbox (and its spam folder).');
+        } catch (RuntimeException $e) {
+            flash($e->getMessage(), 'error');
+        }
+        redirect('/admin/settings.php#contact');
     }
 
     if ($action === 'password') {
@@ -113,6 +125,32 @@ admin_header('Settings & keys', 'settings');
   </form>
 </section>
 
+<section class="panel" id="contact">
+  <div class="panel-head"><h2>Contact form</h2><span class="pill pill--<?= smtp_ready() ? 'paid' : 'draft' ?>"><?= smtp_ready() ? 'sending login saved' : 'no sending login' ?></span></div>
+  <p class="fine">Messages from the <a href="/contact.php">contact page</a> are always saved under <a href="/admin/messages.php">Messages</a>, and emailed to the address below. Replying to one of those emails goes straight to the person who wrote.</p>
+  <form method="post" class="edit-form">
+    <?= csrf_field() ?><input type="hidden" name="action" value="contact">
+    <label class="field">Send messages to
+      <input name="contact_form_to" type="email" value="<?= h(setting('contact_form_to')) ?>" placeholder="<?= h(CVG_CONTACT_TO) ?>">
+      <span class="help">Leave blank to use <?= h(CVG_CONTACT_TO) ?>. Never shown on the site.</span>
+    </label>
+    <label class="field">Sending account <span class="fine">(recommended)</span>
+      <input name="smtp_user" type="email" value="<?= h(setting('smtp_user')) ?>" placeholder="a Gmail address, e.g. the one above" spellcheck="false">
+    </label>
+    <label class="field">App password for that account
+      <?php secret_input('smtp_password', '16-character app password') ?>
+      <span class="help">Without a sending account the server tries to send mail by itself, which usually doesn’t work or lands in spam. For Gmail: turn on 2-Step Verification for the account, then go to <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener">myaccount.google.com/apppasswords</a>, create one called “cvilleglass website”, and paste it here. It only lets the site send email, and you can revoke it there at any time.</span>
+    </label>
+    <details>
+      <summary class="fine">Not using Gmail?</summary>
+      <label class="field field--short">Mail server <input name="smtp_host" value="<?= h(setting('smtp_host')) ?>" placeholder="smtp.gmail.com"></label>
+      <label class="field field--short">Port <input name="smtp_port" inputmode="numeric" value="<?= h(setting('smtp_port')) ?>" placeholder="465"></label>
+    </details>
+    <div class="btn-row"><button class="btn btn--primary" type="submit">Save</button></div>
+  </form>
+  <form method="post"><?= csrf_field() ?><input type="hidden" name="action" value="test_email"><button class="linkish" type="submit">Send a test email to <?= h(contact_to()) ?></button></form>
+</section>
+
 <section class="panel" id="password">
   <h2>Backup login</h2>
   <p class="fine">Works even if Google sign-in is off or broken. Default is <b>admin / password</b> — change it.</p>
@@ -129,9 +167,6 @@ admin_header('Settings & keys', 'settings');
   <h2>Site</h2>
   <form method="post" class="edit-form">
     <?= csrf_field() ?><input type="hidden" name="action" value="site">
-    <label class="field">Contact email <span class="fine">(shown on the pay pages)</span>
-      <input name="contact_email" type="email" value="<?= h(setting('contact_email')) ?>" placeholder="hello@cvilleglass.org">
-    </label>
     <label class="field">Site address <span class="fine">(leave blank unless links come out wrong)</span>
       <input name="site_url" value="<?= h(setting('site_url')) ?>" placeholder="<?= h(site_url()) ?>">
     </label>

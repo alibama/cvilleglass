@@ -50,6 +50,8 @@ Go to **cvilleglass.org/admin/** and sign in with **admin / password**, then:
 6. While signed in, open **/pay/**. Drafts show up for you, so you can make a test payment with card `4242 4242 4242 4242` (any future date, any CVC). It should then appear under **Payments**.
 7. Swap in the **live** Stripe key and live webhook secret, tick **Published** on each item you want people to see, and share the link. Each item also has its own link on the Rentals & classes page.
 
+8. **Settings & keys → Contact form**: messages from the contact page go to ansondparker@gmail.com (change it there). Add a Gmail address and an app password as the sending account, then click **Send a test email**. Without one, mail from the server usually doesn't arrive. Every message is also kept under **Messages** either way.
+
 In Stripe, turn on **Settings → Customer emails → Successful payments** so people get receipts. Money goes to the bank account linked in Stripe.
 
 ## Day to day
@@ -57,6 +59,7 @@ In Stripe, turn on **Settings → Customer emails → Successful payments** so p
 - **Payments** shows who has paid for each month. Use the arrows to move between months. Paying ahead shows up in future months, and weekly payments count toward the month the week starts in.
 - **Record a cash or check payment** (on the Payments page) adds people who paid in person.
 - **Download every payment as a spreadsheet** exports a CSV for the books.
+- **Messages** lists everything sent through the contact form. It marks any that couldn't be emailed.
 - Refunds and disputes are handled in the Stripe dashboard. Each Stripe payment links straight to it.
 
 ## Handing it off

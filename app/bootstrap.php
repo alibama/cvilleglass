@@ -16,6 +16,7 @@ define('CVG_ROOT', dirname(__DIR__));
 define('CVG_DATA', getenv('CVG_DATA_DIR') ?: CVG_ROOT . '/data');
 
 require __DIR__ . '/stripe.php';
+require __DIR__ . '/mail.php';
 require __DIR__ . '/auth.php';
 require __DIR__ . '/layout.php';
 
@@ -88,6 +89,17 @@ function migrate(PDO $pdo): void
             name       TEXT NOT NULL DEFAULT '',
             added_at   TEXT NOT NULL,
             last_login TEXT
+        );
+        CREATE TABLE IF NOT EXISTS messages (   -- from the public contact form
+            id          INTEGER PRIMARY KEY,
+            name        TEXT NOT NULL,
+            email       TEXT NOT NULL,
+            subject     TEXT NOT NULL DEFAULT '',
+            message     TEXT NOT NULL,
+            ip          TEXT NOT NULL DEFAULT '',
+            emailed     INTEGER NOT NULL DEFAULT 0,
+            email_error TEXT NOT NULL DEFAULT '',
+            created_at  TEXT NOT NULL
         );
         CREATE TABLE IF NOT EXISTS login_failures (
             ip TEXT NOT NULL,
@@ -185,9 +197,10 @@ function site_url(string $path = ''): string
     return $base . $path;
 }
 
-function contact_email(): string
+/** Shorten text to $max characters without splitting a UTF-8 character (no mbstring needed). */
+function clip(string $s, int $max): string
 {
-    return setting('contact_email', 'hello@cvilleglass.org');
+    return preg_match('/^.{0,' . $max . '}/su', $s, $m) ? $m[0] : substr($s, 0, $max);
 }
 
 function redirect(string $to): void
